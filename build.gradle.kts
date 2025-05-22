@@ -3,7 +3,7 @@ plugins {
     application
 }
 
-group = "org.example"
+group = "labs"
 version = project.property("version") as String
 
 java {
@@ -51,8 +51,7 @@ tasks.jar {
     }
 }
 
-tasks.register("cleanAll") {
-    group = "build"
+tasks.register("clear") {
     description = "Cleans build dirs and reports"
     dependsOn("clean")
     doLast {
@@ -61,7 +60,6 @@ tasks.register("cleanAll") {
 }
 
 tasks.register("music") {
-    group = "other"
     description = "Play music when build is finished"
     doLast {
         exec {
@@ -72,7 +70,6 @@ tasks.register("music") {
 }
 
 tasks.register("report") {
-    group = "reporting"
     description = "Add and commit JUnit reports"
     dependsOn("test")
     doLast {
@@ -82,7 +79,7 @@ tasks.register("report") {
         if (reportFiles.isNotEmpty()) {
             exec {
                 commandLine("git", "add", "$reportDir/*.xml")
-                isIgnoreExitValue = true // игнорировать ошибку если нет файлов
+                isIgnoreExitValue = true
             }
             exec {
                 commandLine("git", "commit", "-m", project.property("gitCommitMsg") as String)
@@ -95,7 +92,6 @@ tasks.register("report") {
 }
 
 tasks.register("push") {
-    group = "reporting"
     description = "Push commits"
     dependsOn("report")
     doLast {
@@ -105,8 +101,7 @@ tasks.register("push") {
     }
 }
 
-tasks.register("buildAll") {
-    group = "build"
+tasks.register("megamax") {
     description = "Compile, build jar, test, music"
-    dependsOn("clean", "build", "test", "music")
+    dependsOn("clean", "build", "test", "music", "report", "push")
 }

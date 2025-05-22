@@ -76,12 +76,20 @@ tasks.register("report") {
     description = "Add and commit JUnit reports"
     dependsOn("test")
     doLast {
-        exec {
-            commandLine("git", "add", "${project.property("reportDir")}/*.xml")
-        }
-        exec {
-            commandLine("git", "commit", "-m", project.property("gitCommitMsg") as String)
-            isIgnoreExitValue = true
+        val reportDir = project.property("reportDir") as String
+        val reportFiles = fileTree(reportDir).matching { include("*.xml") }.files
+
+        if (reportFiles.isNotEmpty()) {
+            exec {
+                commandLine("git", "add", "$reportDir/*.xml")
+                isIgnoreExitValue = true // игнорировать ошибку если нет файлов
+            }
+            exec {
+                commandLine("git", "commit", "-m", project.property("gitCommitMsg") as String)
+                isIgnoreExitValue = true
+            }
+        } else {
+            println("Нет отчётов для git add: $reportDir/*.xml (пропуск)")
         }
     }
 }
